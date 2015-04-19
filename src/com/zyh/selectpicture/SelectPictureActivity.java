@@ -284,6 +284,7 @@ public class SelectPictureActivity extends Activity {
                         } else {
                             selectedPicture.add(item.path);
                         }
+                        btn_ok.setEnabled(selectedPicture.size()>0);
                         btn_ok.setText("完成" + selectedPicture.size() + "/" + MAX_NUM);
                         v.setSelected(selectedPicture.contains(item.path));
                     }
@@ -353,13 +354,13 @@ public class SelectPictureActivity extends Activity {
         Cursor mCursor = mContentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 new String[] { MediaStore.Images.ImageColumns.DATA }, "", null,
                 MediaStore.MediaColumns.DATE_ADDED + " DESC");
-        Log.e("TAG", mCursor.getCount() + "");
+        // Log.e("TAG", mCursor.getCount() + "");
         if (mCursor.moveToFirst()) {
             int _date = mCursor.getColumnIndex(MediaStore.Images.Media.DATA);
             do {
                 // 获取图片的路径
                 String path = mCursor.getString(_date);
-                Log.e("TAG", path);
+                // Log.e("TAG", path);
                 imageAll.images.add(new ImageItem(path));
                 // 获取该图片的父路径名
                 File parentFile = new File(path).getParentFile();
@@ -374,7 +375,7 @@ public class SelectPictureActivity extends Activity {
                     imageFloder.setDir(dirPath);
                     imageFloder.setFirstImagePath(path);
                     mDirPaths.add(imageFloder);
-                    Log.d("zyh", dirPath + "," + path);
+                    // Log.d("zyh", dirPath + "," + path);
                     tmpDir.put(dirPath, mDirPaths.indexOf(imageFloder));
                 } else {
                     imageFloder = mDirPaths.get(tmpDir.get(dirPath));
@@ -383,10 +384,10 @@ public class SelectPictureActivity extends Activity {
             } while (mCursor.moveToNext());
         }
         mCursor.close();
-        for (int i = 0; i < mDirPaths.size(); i++) {
-            ImageFloder f = mDirPaths.get(i);
-            Log.d("zyh", i + "-----" + f.getName() + "---" + f.images.size());
-        }
+        // for (int i = 0; i < mDirPaths.size(); i++) {
+        //     ImageFloder f = mDirPaths.get(i);
+        //     Log.d("zyh", i + "-----" + f.getName() + "---" + f.images.size());
+        // }
         tmpDir = null;
     }
 
