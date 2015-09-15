@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/title"
+        android:background="#EEEEEE"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_dir"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@+id/title"
+        android:background="#EEFFFFFF"
+        android:translationY="-300dp" />
+
+    <RelativeLayout
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:onClick="back"
+            android:text="取消"
+            android:textColor="#757575"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:drawablePadding="4dp"
+            android:drawableRight="@drawable/navigationbar_arrow_down"
+            android:gravity="center"
+            android:maxLength="15"
+            android:padding="4dp"
+            android:text="图片相册"
+            android:textColor="#757575"
+            android:textSize="16sp" />
+    </RelativeLayout>
+</RelativeLayout>
