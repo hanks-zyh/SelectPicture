@@ -11,6 +11,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 public class GridImageActivity extends Activity {
 
+    private View view_layer;
     private TextView tv_title;
     private RecyclerView recycler_image;
     private RecyclerView recycler_dir;
@@ -64,6 +66,7 @@ public class GridImageActivity extends Activity {
     }
 
     private void bindViews() {
+        view_layer =  findViewById(R.id.view_layer);
         tv_title = (TextView) findViewById(R.id.tv_title);
         recycler_image = (RecyclerView) findViewById(R.id.recycler_view);
         recycler_dir = (RecyclerView) findViewById(R.id.recycler_dir);
@@ -102,6 +105,14 @@ public class GridImageActivity extends Activity {
         recycler_dir.setLayoutManager(new LinearLayoutManager(this));
         dirAdapter = new FolderAdapter();
         recycler_dir.setAdapter(dirAdapter);
+
+        //黑色图层
+        view_layer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideDirList();
+            }
+        });
     }
 
     boolean isDirShowing = false;
@@ -115,7 +126,9 @@ public class GridImageActivity extends Activity {
     }
 
     private void hideDirList() {
-        recycler_dir.animate().translationY(-dp2px(300)).setDuration(300).setListener(new Animator.AnimatorListener() {
+        view_layer.animate().alpha(0).setDuration(300).start();
+
+        recycler_dir.animate().translationY(-dp2px(310)).setDuration(300).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
 
@@ -124,6 +137,7 @@ public class GridImageActivity extends Activity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 isDirShowing = false;
+                view_layer.setVisibility(View.GONE);
             }
 
             @Override
@@ -139,6 +153,8 @@ public class GridImageActivity extends Activity {
     }
 
     private void showDirlist() {
+        view_layer.setVisibility(View.VISIBLE);
+        view_layer.animate().alpha(1).setDuration(300).start();
         recycler_dir.animate().translationY(0).setDuration(300).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -214,7 +230,7 @@ public class GridImageActivity extends Activity {
 
         @Override
         public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = View.inflate(parent.getContext(), R.layout.item_image, null);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image,parent,false);
             return new ImageViewHolder(view);
         }
 
@@ -255,7 +271,7 @@ public class GridImageActivity extends Activity {
     class FolderAdapter extends RecyclerView.Adapter<FolderViewHolder> {
         @Override
         public FolderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = View.inflate(parent.getContext(), R.layout.item_dir, null);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dir, parent, false);
             return new FolderViewHolder(view);
         }
 
