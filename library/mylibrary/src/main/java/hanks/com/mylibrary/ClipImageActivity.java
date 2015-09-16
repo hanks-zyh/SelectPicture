@@ -40,7 +40,7 @@ public class ClipImageActivity extends Activity{
 
     public static void launch(Activity activity,String imagePath){
         Intent intent = new Intent(activity, ClipImageActivity.class);
-        intent.putExtra("iamgePath",imagePath);
+        intent.putExtra("imagePath",imagePath);
         activity.startActivity(intent);
     }
 

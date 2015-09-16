@@ -242,7 +242,10 @@ public class GridImageActivity extends Activity {
             holder.tv_click.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showToast(item.path);
+//                    showToast(item.path);
+
+                    ClipImageActivity.launch(GridImageActivity.this,item.path);
+
                 }
             });
 
