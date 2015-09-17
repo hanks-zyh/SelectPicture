@@ -237,8 +237,11 @@ public class GridImageActivity extends Activity {
         @Override
         public void onBindViewHolder(ImageViewHolder holder, int position) {
 
+
             final ImageItem item = currentImageFolder.images.get(position);
             loader.displayImage("file://" + item.path, holder.imageView, options);
+//            holder.imageView.setImageResource(R.drawable.default_image);
+//            hanks.com.mylibrary.util.ImageLoader.getInstance().loadImage(item.path,holder.imageView);
             holder.tv_click.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -282,6 +285,7 @@ public class GridImageActivity extends Activity {
         public void onBindViewHolder(FolderViewHolder holder, int position) {
             final Floder item = mDirPaths.get(position);
             loader.displayImage("file://" + item.getFirstImagePath(), holder.iv_dir, options);
+//            hanks.com.mylibrary.util.ImageLoader.getInstance().loadImage(item.getFirstImagePath(),holder.iv_dir);
             holder.tv_dirname.setText(item.name + " (" + item.images.size() + "张) ");
             holder.ll_root.setSelected(currentImageFolder == item);
             holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -1,13 +1,10 @@
 package hanks.com.mylibrary.util;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.DisplayMetrics;
 import android.util.LruCache;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.util.LinkedList;
@@ -27,12 +24,12 @@ public class ImageLoader {
 
     //Thread pool
     private ExecutorService mThreadPool;
-    private static final int DEFAULT_THREAD_COUNT = 1;
+    private static final int DEFAULT_THREAD_COUNT = 5;
 
     //Task queue type
     private static final int TYPE_FIFO = 0;
     private static final int TYPE_LIFO = 1;
-    private static int mType = TYPE_FIFO;
+    private static int mType = TYPE_LIFO;
 
     private LinkedList<Runnable> mTaskQueue;
 
@@ -42,6 +39,7 @@ public class ImageLoader {
     private Handler mUIHandler;
 
     private Semaphore mSemaphorePoolThreadHandler = new Semaphore(0);
+    private Semaphore mSemaphorePoolThread;
 
     private ImageLoader(int mThreadCount, int type) {
         init(mThreadCount, type);
@@ -57,6 +55,11 @@ public class ImageLoader {
                 mPoolThreadHandler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
+                        try {
+                            mSemaphorePoolThread.acquire();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         mThreadPool.execute(getTask());
                     }
                 };
@@ -81,14 +84,13 @@ public class ImageLoader {
         mThreadPool = Executors.newFixedThreadPool(threadCount);
         mTaskQueue = new LinkedList<>();
         mType = type;
+
+
+        mSemaphorePoolThread = new Semaphore(threadCount);
     }
 
     private Runnable getTask() {
-        if (mType == TYPE_FIFO) {
-            return mTaskQueue.removeFirst();
-        } else {
-            return mTaskQueue.removeLast();
-        }
+        return mType == TYPE_FIFO ? mTaskQueue.removeFirst() : mTaskQueue.removeLast();
     }
 
     public static ImageLoader getInstance() {
@@ -104,6 +106,9 @@ public class ImageLoader {
 
 
     public void loadImage(final String path, final ImageView imageView) {
+        if(path ==null){
+            return;
+        }
         imageView.setTag(path);
         if (mUIHandler == null) {
             mUIHandler = new Handler() {
@@ -127,24 +132,26 @@ public class ImageLoader {
                 public void run() {
                     //resize image and load image
                     int[] imageSize = new int[2];
-                    getImageViewSize(imageView, imageSize);
+                    ImageUtils.getImageViewSize(imageView, imageSize);
 
                     //resize bitmap
-                    Bitmap bitmap = getResizeBitmap(path, imageSize);
+                    Bitmap bitmap = ImageUtils.getResizeBitmap(path, imageSize);
 
                     //cacheBitmap
-                    cacheBitmap(path,bitmap);
+                    cacheBitmap(path, bitmap);
 
                     //show bitmap
                     refreshImageView(path, imageView, bitmap);
+
+                    mSemaphorePoolThread.release();
                 }
             });
         }
     }
 
     private void cacheBitmap(String path, Bitmap bitmap) {
-        if(mLruCache.get(path) ==null){
-            mLruCache.put(path,bitmap);
+        if (mLruCache.get(path) != null && bitmap!= null ) {
+            mLruCache.put(path, bitmap);
         }
     }
 
@@ -158,57 +165,6 @@ public class ImageLoader {
         mUIHandler.sendMessage(message);
     }
 
-    private Bitmap getResizeBitmap(String path, int[] imageSize) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true; // only get bitmap infomation
-        options.inSampleSize = calcSampleSize(options, imageSize);
-        BitmapFactory.decodeFile(path, options);
-
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(path, options);
-    }
-
-    private int calcSampleSize(BitmapFactory.Options options, int[] imageSize) {
-        int inSampleSize = 1;
-        if (imageSize[0] < options.outWidth || imageSize[1] < options.outHeight) {
-            int widthRadio = Math.round(options.outWidth * 1.0f / imageSize[0]);
-            int heightRadio = Math.round(options.outWidth * 1.0f / imageSize[0]);
-            inSampleSize = Math.min(widthRadio, heightRadio);
-        }
-        return inSampleSize;
-    }
-
-    private void getImageViewSize(ImageView imageView, int[] imageSize) {
-        ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
-        imageSize[0] = imageView.getWidth();
-        if (imageSize[0] <= 0) {
-            imageSize[0] = layoutParams.width;
-        }
-
-        if (imageSize[0] <= 0) {
-            imageSize[0] = imageView.getMaxWidth();
-        }
-
-        if (imageSize[0] <= 0) {
-            DisplayMetrics displayMetrics = imageView.getContext().getResources().getDisplayMetrics();
-            imageSize[0] = displayMetrics.widthPixels;
-        }
-
-        imageSize[1] = imageView.getHeight();
-        if (imageSize[1] <= 0) {
-            imageSize[1] = layoutParams.height;
-        }
-
-        if (imageSize[1] <= 0) {
-            imageSize[1] = imageView.getMaxHeight();
-        }
-
-        if (imageSize[1] <= 0) {
-            DisplayMetrics displayMetrics = imageView.getContext().getResources().getDisplayMetrics();
-            imageSize[1] = displayMetrics.heightPixels;
-        }
-
-    }
 
     private synchronized void addTask(Runnable runnable) {
         mTaskQueue.add(runnable);
