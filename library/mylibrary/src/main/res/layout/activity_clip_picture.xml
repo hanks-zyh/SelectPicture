@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="48dp"
             android:layout_height="match_parent"
-            android:drawableLeft="@drawable/userinfo_tabicon_back"
+            android:drawableLeft="@android:drawable/ic_menu_close_clear_cancel"
             android:gravity="center"
             android:onClick="back"
             android:paddingLeft="8dp"

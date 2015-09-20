@@ -56,12 +56,7 @@ public class ClipImageActivity extends Activity {
     private void handleImageView(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Matrix matrix = new Matrix();
-                Bitmap bm;
-                matrix.setTranslate();
-                Canvas c;
-                c.setMatrix(matrix);
-                c.d
+
                 break;
 
             case MotionEvent.ACTION_MOVE:
