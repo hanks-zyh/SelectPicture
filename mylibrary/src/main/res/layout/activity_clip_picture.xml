@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="48dp"
             android:layout_height="match_parent"
-            android:drawableLeft="@android:drawable/ic_menu_close_clear_cancel"
+            android:drawableLeft="@drawable/userinfo_tabicon_back"
             android:gravity="center"
             android:onClick="back"
             android:paddingLeft="8dp"
@@ -41,6 +41,10 @@
             android:text="完成"
             android:textColor="#757575"
             android:textSize="14sp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_height="0.8dp" android:background="#6666"/>
     </RelativeLayout>
 
 
@@ -48,11 +52,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F2F2F2">
-
-        <ImageView
-            android:id="@+id/imageView"
+        <hanks.com.mylibrary.CropImageView
+            android:id="@+id/cropImageView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/default_image" />
+            android:layout_height="match_parent" />
     </FrameLayout>
 </LinearLayout>

@@ -246,7 +246,6 @@ public class GridImageActivity extends Activity {
                 @Override
                 public void onClick(View v) {
 //                    showToast(item.path);
-
                     ClipImageActivity.launch(GridImageActivity.this,item.path);
 
                 }

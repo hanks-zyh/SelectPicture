@@ -33,6 +33,7 @@ public class ImageUtils {
         return inSampleSize;
     }
 
+
     public static void getImageViewSize(ImageView imageView, int[] imageSize) {
         ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
         imageSize[0] = imageView.getWidth();
@@ -55,7 +56,7 @@ public class ImageUtils {
         }
 
         if (imageSize[1] <= 0) {
-            imageSize[1] = getImageViewField(imageView,"mMaxHeight");
+            imageSize[1] = getImageViewField(imageView, "mMaxHeight");
         }
 
         if (imageSize[1] <= 0) {

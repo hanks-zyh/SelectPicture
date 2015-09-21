@@ -18,7 +18,7 @@ import hanks.com.mylibrary.util.ImageUtils;
  */
 public class ClipImageActivity extends Activity {
 
-    private ImageView imageView;
+    private CropImageView cropImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +26,10 @@ public class ClipImageActivity extends Activity {
         setContentView(R.layout.activity_clip_picture);
         bindViews();
         initViews();
-        setLisenters();
     }
 
     private void bindViews() {
-        imageView = (ImageView) findViewById(R.id.imageView);
+        cropImageView = (CropImageView) findViewById(R.id.cropImageView);
     }
 
     private void initViews() {
@@ -38,20 +37,12 @@ public class ClipImageActivity extends Activity {
             @Override
             public void run() {
                 String imagePath = getIntent().getStringExtra("imagePath");
-                ImageUtils.setImageBitmap(imageView, imagePath);
+
+                cropImageView.setImagePath(imagePath);
             }
         }, 100);
     }
 
-    private void setLisenters() {
-        imageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                handleImageView(event);
-                return true;
-            }
-        });
-    }
 
     private void handleImageView(MotionEvent event) {
         switch (event.getAction()) {
@@ -67,6 +58,7 @@ public class ClipImageActivity extends Activity {
                 break;
         }
     }
+
 
     public static void launch(Activity activity, String imagePath) {
         Intent intent = new Intent(activity, ClipImageActivity.class);
