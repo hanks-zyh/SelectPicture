@@ -37,27 +37,11 @@ public class ClipImageActivity extends Activity {
             @Override
             public void run() {
                 String imagePath = getIntent().getStringExtra("imagePath");
-
                 cropImageView.setImagePath(imagePath);
             }
         }, 100);
     }
 
-
-    private void handleImageView(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                break;
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                break;
-        }
-    }
 
 
     public static void launch(Activity activity, String imagePath) {

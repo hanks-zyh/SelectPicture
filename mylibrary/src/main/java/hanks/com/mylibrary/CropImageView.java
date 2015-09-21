@@ -110,10 +110,17 @@ public class CropImageView extends View {
 
             case MotionEvent.ACTION_MOVE:
                 showL("move");
-                if (!bitmapInBound()) break;
-                mMatrix.postTranslate(event.getX() - dx, event.getY() - dy);
-                totalLeft += event.getX() - dx;
-                totalRight += event.getX() - dx;
+                int tempx = (int) (event.getX() - dx);
+                totalLeft += tempx;
+                totalRight += tempx;
+                showL("left:" + totalLeft + "right:" + totalRight);
+                if (!bitmapInBound()) {
+                    //检测到要超出边界， 回退
+                    totalLeft -= tempx;
+                    totalRight -= tempx;
+                    tempx = 0;
+                }
+                mMatrix.postTranslate(tempx, event.getY() - dy);
                 dx = event.getX();
                 dy = event.getY();
                 invalidate();
@@ -122,17 +129,20 @@ public class CropImageView extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
 
+                //手指抬起
+
                 showL("up");
                 break;
         }
         return true;
     }
 
-    int totalLeft= 0;
+    int totalLeft = 0;
     int totalRight = 0;
 
     private boolean bitmapInBound() {
-        return totalRight >= 0 && totalLeft <=0;
+
+        return totalRight >= 0 && totalLeft <= 0;
     }
 
     public void setImagePath(String imagePath) {
@@ -169,8 +179,10 @@ public class CropImageView extends View {
         mMatrix.setScale(scale, scale);
         mMatrix.postTranslate(viewWidth / 2 - w * scale / 2, viewHeight / 2 - h * scale / 2);
 
-        totalLeft = -(w - viewSize) /2;
-        totalRight = (w - viewSize) /2;
+        //计算左右可以滑动的距离
+        totalLeft = (int) (-(w * scale - viewSize) / 2);
+        totalRight = (int) ((w * scale - viewSize) / 2);
+        showL("**left:" + totalLeft + "right:" + totalRight);
     }
 
     public void showL(String string) {
