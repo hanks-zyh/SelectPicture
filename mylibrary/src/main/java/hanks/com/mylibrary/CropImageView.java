@@ -7,15 +7,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 
 import hanks.com.mylibrary.util.ImageUtils;
 
@@ -25,6 +22,8 @@ import hanks.com.mylibrary.util.ImageUtils;
 public class CropImageView extends View {
     private Paint cropPaint;
     private Paint layerPaint;
+    private Paint bmPaint;
+
     private Rect cropRect;
     private int viewWidth, viewHeight;
 
@@ -32,7 +31,7 @@ public class CropImageView extends View {
     private Bitmap mBitmap;
     private Matrix mMatrix;
     private int viewSize;
-    private float dx,dy;
+    private float dx, dy;
 
     public CropImageView(Context context) {
         super(context);
@@ -61,6 +60,9 @@ public class CropImageView extends View {
         cropPaint.setColor(Color.WHITE);
         cropPaint.setAlpha(0);
 
+        bmPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bmPaint.setColor(Color.WHITE);
+
         layerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         layerPaint.setColor(Color.WHITE);
         layerPaint.setAlpha(200);
@@ -85,9 +87,10 @@ public class CropImageView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         if (mBitmap == null) return;
-        canvas.drawBitmap(mBitmap, mMatrix, layerPaint);
+
+
+        canvas.drawBitmap(mBitmap, mMatrix, bmPaint);
         canvas.drawRect(0, 0, viewWidth, (viewHeight - viewWidth) / 2, layerPaint);
-        canvas.drawRect(cropRect, cropPaint);
         canvas.drawRect(0, (viewHeight - viewWidth) / 2 + viewWidth, viewWidth, viewHeight, layerPaint);
     }
 
@@ -107,7 +110,10 @@ public class CropImageView extends View {
 
             case MotionEvent.ACTION_MOVE:
                 showL("move");
-                mMatrix.postTranslate(event.getX()-dx,event.getY()-dy);
+                if (!bitmapInBound()) break;
+                mMatrix.postTranslate(event.getX() - dx, event.getY() - dy);
+                totalLeft += event.getX() - dx;
+                totalRight += event.getX() - dx;
                 dx = event.getX();
                 dy = event.getY();
                 invalidate();
@@ -115,10 +121,18 @@ public class CropImageView extends View {
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+
                 showL("up");
                 break;
         }
         return true;
+    }
+
+    int totalLeft= 0;
+    int totalRight = 0;
+
+    private boolean bitmapInBound() {
+        return totalRight >= 0 && totalLeft <=0;
     }
 
     public void setImagePath(String imagePath) {
@@ -150,13 +164,16 @@ public class CropImageView extends View {
             }
         }
 
-        showL(scale+"-------------------------------");
+        showL(scale + "-------------------------------");
         mMatrix.reset();
         mMatrix.setScale(scale, scale);
-        mMatrix.postTranslate(viewWidth / 2 - w*scale/2, viewHeight / 2-h*scale/2);
+        mMatrix.postTranslate(viewWidth / 2 - w * scale / 2, viewHeight / 2 - h * scale / 2);
+
+        totalLeft = -(w - viewSize) /2;
+        totalRight = (w - viewSize) /2;
     }
 
-    public void showL(String string){
-        Log.i("",string);
+    public void showL(String string) {
+        Log.i("", string);
     }
 }
