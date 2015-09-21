@@ -13,6 +13,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -31,6 +32,7 @@ public class CropImageView extends View {
     private Bitmap mBitmap;
     private Matrix mMatrix;
     private int viewSize;
+    private float dx,dy;
 
     public CropImageView(Context context) {
         super(context);
@@ -87,7 +89,36 @@ public class CropImageView extends View {
         canvas.drawRect(0, 0, viewWidth, (viewHeight - viewWidth) / 2, layerPaint);
         canvas.drawRect(cropRect, cropPaint);
         canvas.drawRect(0, (viewHeight - viewWidth) / 2 + viewWidth, viewWidth, viewHeight, layerPaint);
+    }
 
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return handleTouchEvent(event);
+    }
+
+    private boolean handleTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                showL("down");
+                dx = event.getX();
+                dy = event.getY();
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                showL("move");
+                mMatrix.postTranslate(event.getX()-dx,event.getY()-dy);
+                dx = event.getX();
+                dy = event.getY();
+                invalidate();
+                break;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                showL("up");
+                break;
+        }
+        return true;
     }
 
     public void setImagePath(String imagePath) {
