@@ -325,7 +325,7 @@ public class CropImageView extends View {
         if (scale > 1) { //放大
             result = true;
         } else { //缩小
-            result = x1 + Math.sqrt(scale)*(centerX-x1) <= -dp2px(5)   && x2 - Math.sqrt(scale)*(x2-centerX) >= viewWidth + dp2px(5)  ;
+            result = x1 + ((centerX-x1)*1f/(x2-x2)) * ( (x2-x1) - (x2-x1)*Math.sqrt(scale)) <= -dp2px(5)   && x2 -  ((centerX-x1)*1f/(x2-x2)) * ( (x2-x1) - (x2-x1)*Math.sqrt(scale)) >= viewWidth + dp2px(5)  ;
         }
 
         return result;
