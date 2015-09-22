@@ -1,9 +1,11 @@
 package hanks.com.mylibrary;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -70,6 +72,7 @@ public class GridImageActivity extends Activity {
         tv_title = (TextView) findViewById(R.id.tv_title);
         recycler_image = (RecyclerView) findViewById(R.id.recycler_view);
         recycler_dir = (RecyclerView) findViewById(R.id.recycler_dir);
+        view_layer.setVisibility(View.GONE);
     }
 
     private void initViews() {
@@ -128,26 +131,12 @@ public class GridImageActivity extends Activity {
     private void hideDirList() {
         view_layer.animate().alpha(0).setDuration(300).start();
 
-        recycler_dir.animate().translationY(-dp2px(310)).setDuration(300).setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
+        recycler_dir.animate().translationY(-dp2px(310)).setDuration(300).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
                 isDirShowing = false;
                 view_layer.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         }).start();
     }
@@ -155,28 +144,15 @@ public class GridImageActivity extends Activity {
     private void showDirlist() {
         view_layer.setVisibility(View.VISIBLE);
         view_layer.animate().alpha(1).setDuration(300).start();
-        recycler_dir.animate().translationY(0).setDuration(300).setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
+        recycler_dir.animate().translationY(0).setDuration(300).setListener(new AnimatorListenerAdapter(){
             @Override
             public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
                 isDirShowing = true;
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         }).start();
     }
+
 
     /**
      * 得到缩略图
