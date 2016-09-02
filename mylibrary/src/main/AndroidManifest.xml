@@ -11,6 +11,10 @@
         android:label="@string/app_name" >
         <activity android:name=".GridImageActivity"/>
         <activity android:name=".ClipImageActivity"/>
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

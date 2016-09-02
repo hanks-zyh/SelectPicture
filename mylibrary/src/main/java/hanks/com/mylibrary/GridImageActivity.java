@@ -3,8 +3,11 @@ package hanks.com.mylibrary;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -218,7 +223,20 @@ public class GridImageActivity extends Activity {
             holder.tv_click.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ClipImageActivity.launch(GridImageActivity.this, item.path);
+
+                    String destinationFileName = item.path.hashCode() + "";
+                    Uri sourceUri = Uri.fromFile(new File(item.path));
+                    Uri destinationUri = Uri.fromFile(new File(getCacheDir(), destinationFileName));
+                    UCrop.Options options = new UCrop.Options();
+                    options.setStatusBarColor(Color.BLACK);
+                    options.setToolbarColor(Color.WHITE);
+                    options.setToolbarWidgetColor(Color.BLACK);
+                    options.setActiveWidgetColor(Color.RED);
+                    UCrop.of(sourceUri, destinationUri)
+                            .withOptions(options)
+                            .start(GridImageActivity.this);
+
+//                    ClipImageActivity.launch(GridImageActivity.this, item.path);
                 }
             });
         }
@@ -369,5 +387,17 @@ public class GridImageActivity extends Activity {
         }
 
 
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            Log.e("",resultUri.getEncodedPath());
+            ClipImageActivity.launch(GridImageActivity.this,resultUri.getPath());
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            final Throwable cropError = UCrop.getError(data);
+        }
     }
 }
