@@ -35,6 +35,7 @@ import hanks.com.mylibrary.base.HImageLoader;
  */
 public class GridImageActivity extends Activity {
 
+    public static final String EXTRA_PATH = "path";
     boolean isDirShowing = false;
     private View view_layer;
     private TextView tv_title;
@@ -208,6 +209,18 @@ public class GridImageActivity extends Activity {
         Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            data.putExtra(EXTRA_PATH, resultUri.getPath());
+            setResult(RESULT_OK, data);
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            final Throwable cropError = UCrop.getError(data);
+            Toast.makeText(GridImageActivity.this, cropError.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     class ImageAdapter extends RecyclerView.Adapter<ImageViewHolder> {
 
         @Override
@@ -235,7 +248,6 @@ public class GridImageActivity extends Activity {
                     UCrop.of(sourceUri, destinationUri)
                             .withOptions(options)
                             .start(GridImageActivity.this);
-
 //                    ClipImageActivity.launch(GridImageActivity.this, item.path);
                 }
             });
@@ -384,20 +396,6 @@ public class GridImageActivity extends Activity {
                     outRect.top = spacing; // item top
                 }
             }
-        }
-
-
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            final Uri resultUri = UCrop.getOutput(data);
-            Log.e("",resultUri.getEncodedPath());
-            ClipImageActivity.launch(GridImageActivity.this,resultUri.getPath());
-        } else if (resultCode == UCrop.RESULT_ERROR) {
-            final Throwable cropError = UCrop.getError(data);
         }
     }
 }
