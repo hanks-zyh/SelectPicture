@@ -101,10 +101,17 @@ public class ImageLoader {
     }
 
     public void loadImage(final ImageView imageView, final String path) {
+        loadImage(imageView, path, 0);
+    }
+
+    public void loadImage(final ImageView imageView, final String path, int defaultRes) {
         if (path == null) {
             return;
         }
         imageView.setTag(path);
+        if (defaultRes != 0) {
+            imageView.setImageResource(defaultRes);
+        }
         if (mUIHandler == null) {
             mUIHandler = new Handler() {
                 @Override

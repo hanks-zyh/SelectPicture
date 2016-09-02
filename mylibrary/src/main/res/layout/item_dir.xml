@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/ll_root"
-    android:background="@drawable/text_seletor"
-    android:orientation="horizontal">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:id="@+id/ll_root"
+             android:layout_width="match_parent"
+             android:layout_height="58dp"
+             android:foreground="@drawable/text_seletor"
+             android:orientation="horizontal">
 
     <ImageView
-        android:layout_margin="4dp"
-        android:scaleType="centerCrop"
         android:id="@+id/iv_dir"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:layout_margin="4dp"
+        android:scaleType="centerCrop"/>
 
     <TextView
+        android:layout_marginLeft="58dp"
         android:id="@+id/tv_dirname"
-        android:paddingLeft="12dp"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:paddingLeft="12dp"/>
+</FrameLayout>

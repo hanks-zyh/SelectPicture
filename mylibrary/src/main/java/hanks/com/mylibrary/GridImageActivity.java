@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import hanks.com.mylibrary.base.HImageLoader;
-import hanks.com.mylibrary.util.ImageLoader;
 
 /**
  * Created by Hanks on 2015/9/14.
@@ -37,17 +36,15 @@ public class GridImageActivity extends Activity {
     private RecyclerView recycler_image;
     private RecyclerView recycler_dir;
     private ImageAdapter imageAdapter;
-    private ArrayList<Folder> mDirPaths = new ArrayList<Folder>();
+    private ArrayList<Folder> mDirPaths = new ArrayList<>();
     /**
      * 已选择的图片
      */
-    private ArrayList<String> selectedPicture = new ArrayList<String>();
+    private ArrayList<String> selectedPicture = new ArrayList<>();
     private String cameraPath = null;
     private Folder imageAll, currentImageFolder;
-    //    private ImageLoader loader;
-//    private DisplayImageOptions options;
     private FolderAdapter dirAdapter;
-//    private HImageLoader imageLoader;
+    private HImageLoader imageLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +68,7 @@ public class GridImageActivity extends Activity {
     }
 
     private void initViews() {
-//        loader = ImageLoader.getInstance();
-//        options = new DisplayImageOptions.Builder().showImageOnLoading(R.drawable.default_image)
-//                .showImageForEmptyUri(R.drawable.default_image).showImageOnFail(R.drawable.default_image)
-//                .cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
-//                .imageScaleType(ImageScaleType.EXACTLY).bitmapConfig(Bitmap.Config.RGB_565).build();
-
-
-//        imageLoader = HGallery.getImageLoader(this);
+        imageLoader = HGallery.getImageLoader(this);
         imageAll = new Folder();
         imageAll.setDir("/所有图片");
         currentImageFolder = imageAll;
@@ -223,23 +213,14 @@ public class GridImageActivity extends Activity {
 
         @Override
         public void onBindViewHolder(ImageViewHolder holder, int position) {
-
-
             final ImageItem item = currentImageFolder.images.get(position);
-            ImageLoader.getInstance().loadImage(holder.imageView, item.path);
-//            imageLoader.displayImage(holder.imageView, item.path);
-//            loader.displayImage("file://" + item.path, holder.imageView, options);
-//            holder.imageView.setImageResource(R.drawable.default_image);
-//            hanks.com.mylibrary.util.ImageLoader.getInstance().loadImage(item.path,holder.imageView);
+            imageLoader.displayImage(holder.imageView, item.path);
             holder.tv_click.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    showToast(item.path);
                     ClipImageActivity.launch(GridImageActivity.this, item.path);
-
                 }
             });
-
         }
 
         @Override
@@ -271,11 +252,9 @@ public class GridImageActivity extends Activity {
         @Override
         public void onBindViewHolder(FolderViewHolder holder, int position) {
             final Folder item = mDirPaths.get(position);
-            ImageLoader.getInstance().loadImage(holder.iv_dir, item.getFirstImagePath());
-//            imageLoader.displayImage(holder.iv_dir, item.getFirstImagePath());
-//            loader.displayImage("file://" + item.getFirstImagePath(), holder.iv_dir, options);
-//            hanks.com.mylibrary.util.ImageLoader.getInstance().loadImage(item.getFirstImagePath(),holder.iv_dir);
-            holder.tv_dirname.setText(item.name + " (" + item.images.size() + "张) ");
+            imageLoader.displayImage(holder.iv_dir, item.getFirstImagePath());
+            String name = item.name.startsWith("/") ? item.name.substring(1) : item.name;
+            holder.tv_dirname.setText(name + " (" + item.images.size() + "张) ");
             holder.ll_root.setSelected(currentImageFolder == item);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

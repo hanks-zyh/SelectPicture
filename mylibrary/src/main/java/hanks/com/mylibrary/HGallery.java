@@ -3,6 +3,7 @@ package hanks.com.mylibrary;
 import android.content.Context;
 import android.content.Intent;
 
+import hanks.com.mylibrary.base.DefalutImageLoader;
 import hanks.com.mylibrary.base.HImageLoader;
 
 /**
@@ -17,7 +18,7 @@ public class HGallery {
         if (sImageLoader == null) {
             synchronized (HGallery.class) {
                 if (sImageLoader == null) {
-                    throw new RuntimeException("请调用MQConfig.init方法初始化美洽 SDK，并传入MQImageLoader接口的实现类");
+                    sImageLoader = new DefalutImageLoader();
                 }
             }
         }
