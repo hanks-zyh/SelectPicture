@@ -17,20 +17,16 @@ import java.util.concurrent.Semaphore;
  */
 public class ImageLoader {
 
-    private static ImageLoader mInstance;
-
-    //lru
-    private LruCache<String, Bitmap> mLruCache;
-
-    //Thread pool
-    private ExecutorService mThreadPool;
     private static final int DEFAULT_THREAD_COUNT = 5;
-
     //Task queue type
     private static final int TYPE_FIFO = 0;
     private static final int TYPE_LIFO = 1;
+    private static ImageLoader mInstance;
     private static int mType = TYPE_LIFO;
-
+    //lru
+    private LruCache<String, Bitmap> mLruCache;
+    //Thread pool
+    private ExecutorService mThreadPool;
     private LinkedList<Runnable> mTaskQueue;
 
     private Thread mPoolThread;
@@ -43,6 +39,17 @@ public class ImageLoader {
 
     private ImageLoader(int mThreadCount, int type) {
         init(mThreadCount, type);
+    }
+
+    public static ImageLoader getInstance() {
+        if (mInstance == null) {
+            synchronized (ImageLoader.class) {
+                if (mInstance == null) {
+                    mInstance = new ImageLoader(DEFAULT_THREAD_COUNT, mType);
+                }
+            }
+        }
+        return mInstance;
     }
 
     private void init(int threadCount, int type) {
@@ -93,20 +100,8 @@ public class ImageLoader {
         return mType == TYPE_FIFO ? mTaskQueue.removeFirst() : mTaskQueue.removeLast();
     }
 
-    public static ImageLoader getInstance() {
-        if (mInstance == null) {
-            synchronized (ImageLoader.class) {
-                if (mInstance == null) {
-                    mInstance = new ImageLoader(DEFAULT_THREAD_COUNT, mType);
-                }
-            }
-        }
-        return mInstance;
-    }
-
-
-    public void loadImage(final String path, final ImageView imageView) {
-        if(path ==null){
+    public void loadImage(final ImageView imageView, final String path) {
+        if (path == null) {
             return;
         }
         imageView.setTag(path);
@@ -150,7 +145,7 @@ public class ImageLoader {
     }
 
     private void cacheBitmap(String path, Bitmap bitmap) {
-        if (mLruCache.get(path) != null && bitmap!= null ) {
+        if (mLruCache.get(path) != null && bitmap != null) {
             mLruCache.put(path, bitmap);
         }
     }

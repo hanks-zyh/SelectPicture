@@ -4,8 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,39 +18,36 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import hanks.com.mylibrary.base.HImageLoader;
+import hanks.com.mylibrary.util.ImageLoader;
 
 /**
  * Created by Hanks on 2015/9/14.
  */
 public class GridImageActivity extends Activity {
 
+    boolean isDirShowing = false;
     private View view_layer;
     private TextView tv_title;
     private RecyclerView recycler_image;
     private RecyclerView recycler_dir;
     private ImageAdapter imageAdapter;
-
-
-    private ArrayList<Floder> mDirPaths = new ArrayList<Floder>();
-
+    private ArrayList<Folder> mDirPaths = new ArrayList<Folder>();
     /**
      * 已选择的图片
      */
     private ArrayList<String> selectedPicture = new ArrayList<String>();
     private String cameraPath = null;
-
-    private Floder imageAll, currentImageFolder;
-    private ImageLoader loader;
-    private DisplayImageOptions options;
+    private Folder imageAll, currentImageFolder;
+    //    private ImageLoader loader;
+//    private DisplayImageOptions options;
     private FolderAdapter dirAdapter;
+//    private HImageLoader imageLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +63,7 @@ public class GridImageActivity extends Activity {
     }
 
     private void bindViews() {
-        view_layer =  findViewById(R.id.view_layer);
+        view_layer = findViewById(R.id.view_layer);
         tv_title = (TextView) findViewById(R.id.tv_title);
         recycler_image = (RecyclerView) findViewById(R.id.recycler_view);
         recycler_dir = (RecyclerView) findViewById(R.id.recycler_dir);
@@ -76,13 +71,15 @@ public class GridImageActivity extends Activity {
     }
 
     private void initViews() {
-        loader = ImageLoader.getInstance();
-        options = new DisplayImageOptions.Builder().showImageOnLoading(R.drawable.default_image)
-                .showImageForEmptyUri(R.drawable.default_image).showImageOnFail(R.drawable.default_image)
-                .cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
-                .imageScaleType(ImageScaleType.EXACTLY).bitmapConfig(Bitmap.Config.RGB_565).build();
+//        loader = ImageLoader.getInstance();
+//        options = new DisplayImageOptions.Builder().showImageOnLoading(R.drawable.default_image)
+//                .showImageForEmptyUri(R.drawable.default_image).showImageOnFail(R.drawable.default_image)
+//                .cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
+//                .imageScaleType(ImageScaleType.EXACTLY).bitmapConfig(Bitmap.Config.RGB_565).build();
 
-        imageAll = new Floder();
+
+//        imageLoader = HGallery.getImageLoader(this);
+        imageAll = new Folder();
         imageAll.setDir("/所有图片");
         currentImageFolder = imageAll;
         mDirPaths.add(imageAll);
@@ -118,8 +115,6 @@ public class GridImageActivity extends Activity {
         });
     }
 
-    boolean isDirShowing = false;
-
     private void toggleDirlistPop() {
         if (isDirShowing) {
             hideDirList();
@@ -144,7 +139,7 @@ public class GridImageActivity extends Activity {
     private void showDirlist() {
         view_layer.setVisibility(View.VISIBLE);
         view_layer.animate().alpha(1).setDuration(300).start();
-        recycler_dir.animate().translationY(0).setDuration(300).setListener(new AnimatorListenerAdapter(){
+        recycler_dir.animate().translationY(0).setDuration(300).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -178,11 +173,11 @@ public class GridImageActivity extends Activity {
                 if (parentFile == null) {
                     continue;
                 }
-                Floder imageFloder = null;
+                Folder imageFloder = null;
                 String dirPath = parentFile.getAbsolutePath();
                 if (!tmpDir.containsKey(dirPath)) {
                     // 初始化imageFloder
-                    imageFloder = new Floder();
+                    imageFloder = new Folder();
                     imageFloder.setDir(dirPath);
                     imageFloder.setFirstImagePath(path);
                     mDirPaths.add(imageFloder);
@@ -196,17 +191,33 @@ public class GridImageActivity extends Activity {
         }
         mCursor.close();
         for (int i = 0; i < mDirPaths.size(); i++) {
-            Floder f = mDirPaths.get(i);
+            Folder f = mDirPaths.get(i);
             Log.d("zyh", i + "-----" + f.getName() + "---" + f.images.size());
         }
         tmpDir = null;
+    }
+
+    private void resetDirList(Folder selectFolder) {
+        currentImageFolder = selectFolder;
+        dirAdapter.notifyDataSetChanged();
+        imageAdapter.notifyDataSetChanged();
+        hideDirList();
+    }
+
+    public int dp2px(int dp) {
+        float scale = getResources().getDisplayMetrics().densityDpi;
+        return (int) (dp * scale / 160 + 0.5f);
+    }
+
+    private void showToast(String string) {
+        Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
     }
 
     class ImageAdapter extends RecyclerView.Adapter<ImageViewHolder> {
 
         @Override
         public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image,parent,false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image, parent, false);
             return new ImageViewHolder(view);
         }
 
@@ -215,14 +226,16 @@ public class GridImageActivity extends Activity {
 
 
             final ImageItem item = currentImageFolder.images.get(position);
-            loader.displayImage("file://" + item.path, holder.imageView, options);
+            ImageLoader.getInstance().loadImage(holder.imageView, item.path);
+//            imageLoader.displayImage(holder.imageView, item.path);
+//            loader.displayImage("file://" + item.path, holder.imageView, options);
 //            holder.imageView.setImageResource(R.drawable.default_image);
 //            hanks.com.mylibrary.util.ImageLoader.getInstance().loadImage(item.path,holder.imageView);
             holder.tv_click.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 //                    showToast(item.path);
-                    ClipImageActivity.launch(GridImageActivity.this,item.path);
+                    ClipImageActivity.launch(GridImageActivity.this, item.path);
 
                 }
             });
@@ -248,7 +261,6 @@ public class GridImageActivity extends Activity {
 
     }
 
-
     class FolderAdapter extends RecyclerView.Adapter<FolderViewHolder> {
         @Override
         public FolderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -258,8 +270,10 @@ public class GridImageActivity extends Activity {
 
         @Override
         public void onBindViewHolder(FolderViewHolder holder, int position) {
-            final Floder item = mDirPaths.get(position);
-            loader.displayImage("file://" + item.getFirstImagePath(), holder.iv_dir, options);
+            final Folder item = mDirPaths.get(position);
+            ImageLoader.getInstance().loadImage(holder.iv_dir, item.getFirstImagePath());
+//            imageLoader.displayImage(holder.iv_dir, item.getFirstImagePath());
+//            loader.displayImage("file://" + item.getFirstImagePath(), holder.iv_dir, options);
 //            hanks.com.mylibrary.util.ImageLoader.getInstance().loadImage(item.getFirstImagePath(),holder.iv_dir);
             holder.tv_dirname.setText(item.name + " (" + item.images.size() + "张) ");
             holder.ll_root.setSelected(currentImageFolder == item);
@@ -277,13 +291,6 @@ public class GridImageActivity extends Activity {
         }
     }
 
-    private void resetDirList(Floder selectFolder) {
-        currentImageFolder = selectFolder;
-        dirAdapter.notifyDataSetChanged();
-        imageAdapter.notifyDataSetChanged();
-        hideDirList();
-    }
-
     class FolderViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView iv_dir;
@@ -298,10 +305,10 @@ public class GridImageActivity extends Activity {
         }
     }
 
+    class Folder {
 
-    class Floder {
 
-
+        public List<ImageItem> images = new ArrayList<ImageItem>();
         /**
          * 图片的文件夹路径
          */
@@ -310,12 +317,10 @@ public class GridImageActivity extends Activity {
          * 第一张图片的路径
          */
         private String firstImagePath;
-
         /**
          * 文件夹的名称
          */
         private String name;
-        public List<ImageItem> images = new ArrayList<ImageItem>();
 
         public String getDir() {
             return dir;
@@ -385,14 +390,5 @@ public class GridImageActivity extends Activity {
         }
 
 
-    }
-
-    public int dp2px(int dp) {
-        float scale = getResources().getDisplayMetrics().densityDpi;
-        return (int) (dp * scale / 160 + 0.5f);
-    }
-
-    private void showToast(String string) {
-        Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
     }
 }
